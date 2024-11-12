@@ -20,9 +20,9 @@ BG_COLOR = palette[0]
 FLOOR_COLOR = palette[13]
 
 # 
-GRAVITY = 2600
+GRAVITY = 200
 MAX_SPEED = 500
-JUMP_SPEED = 1200
+JUMP_SPEED = 40
 ACCELERATION = 1500
 DRAG = 400
 
@@ -128,15 +128,15 @@ while True:
 
     dude_x += dude_vel_x * dt
 
-    # detect bounds and limiting the dude in the screen
     dude_vel_y += GRAVITY * dt
-    dude_y += dude_vel_y * dt
+    dude_y += dude_vel_y
 
     if dude_y + dude.get_rect().height >= 500:
         dude_y = 500 - dude.get_rect().height
         dude_vel_y = 0
         dude_can_jump = True
     
+    # detect bounds and limiting the dude in the screen
     if(dude_x <= 0):
         dude_x = 0
 
@@ -159,21 +159,27 @@ while True:
 
     # Debugging
     # Velocity
-    text_content = f"Velocity: { dude_vel_x }"
+    text_content = f"Velocity X: { dude_vel_x }"
     text_surface = pixel_font.render(text_content, True, palette[2])
     text_rect = text_surface.get_rect(topleft=(50, 130))
+    screen.blit(text_surface, text_rect)
+
+    # Velocity
+    text_content = f"Velocity Y: { dude_vel_y }"
+    text_surface = pixel_font.render(text_content, True, palette[2])
+    text_rect = text_surface.get_rect(topleft=(50, 160))
     screen.blit(text_surface, text_rect)
 
     # Acceleration
     text_content = f"Acceleration: {int( dude_acc_x )}"
     text_surface = pixel_font.render(text_content, True, palette[2])
-    text_rect = text_surface.get_rect(topleft=(50, 160))
+    text_rect = text_surface.get_rect(topleft=(50, 190))
     screen.blit(text_surface, text_rect)
 
     # Dude is jumping
     text_content = f"Dude is touching ground: {dude_can_jump}"
     text_surface = pixel_font.render(text_content, True, palette[2])
-    text_rect = text_surface.get_rect(topleft=(50, 190))
+    text_rect = text_surface.get_rect(topleft=(50, 220))
     screen.blit(text_surface, text_rect)
 
 	# This method refreshes all the screen, is part of a good practice keep it here
