@@ -22,9 +22,10 @@ FLOOR_COLOR = palette[13]
 # 
 GRAVITY = 200
 MAX_SPEED = 500
-JUMP_SPEED = 40
+JUMP_SPEED = 30
 ACCELERATION = 1500
 DRAG = 400
+MAX_NUM_OF_JUMPS = 2
 
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -42,7 +43,7 @@ dude_vel_x = 0
 dude_vel_y = 0
 dude_acc_x = 0
 dude_can_jump = False
-num_of_jumps = 2
+num_of_jumps = 0
 
 # setup floor
 tile_floor = pygame.image.load('./assets/img/bg_one.png').convert_alpha()
@@ -107,13 +108,12 @@ while True:
         if is_input_right_active(event, screen):
             dude_acc_x += ACCELERATION
             
-        if is_input_top_active(event, screen) and dude_can_jump:
+        if is_input_top_active(event, screen) and num_of_jumps < MAX_NUM_OF_JUMPS:
             dude_vel_y -= JUMP_SPEED
-            dude_can_jump = False
+            num_of_jumps += 1
 
         if event.type == pygame.KEYUP or is_button_up(event):
             dude_acc_x = 0
-            dude_can_jump = False
 
 	# This is the magic sentence where our screen finally renders our DEMO_BG_COLOR, yay!
     screen.fill(BG_COLOR)
@@ -135,7 +135,7 @@ while True:
     if dude_y + dude.get_rect().height >= 500:
         dude_y = 500 - dude.get_rect().height
         dude_vel_y = 0
-        dude_can_jump = True
+        num_of_jumps = 0
     
     # detect bounds and limiting the dude in the screen
     if(dude_x <= 0):
@@ -178,7 +178,7 @@ while True:
     screen.blit(text_surface, text_rect)
 
     # Dude is jumping
-    text_content = f"Dude is touching ground: {dude_can_jump}"
+    text_content = f"Num of jumps: {num_of_jumps}"
     text_surface = pixel_font.render(text_content, True, palette[2])
     text_rect = text_surface.get_rect(topleft=(50, 220))
     screen.blit(text_surface, text_rect)
