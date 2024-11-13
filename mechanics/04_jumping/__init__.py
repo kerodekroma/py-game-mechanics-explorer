@@ -29,7 +29,7 @@ DRAG = 400
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 # Adding our awesone caption to show in the top of our fresh screen
-pygame.display.set_caption("mechanics > drag")
+pygame.display.set_caption("mechanics > jumping")
 
 # clock
 clock = pygame.time.Clock()
