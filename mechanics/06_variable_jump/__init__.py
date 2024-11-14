@@ -1,5 +1,5 @@
 # how to execute it in cmd:
-# python -m mechanics.05_variable_jump
+# python -m mechanics.06_variable_jump
 
 import pygame
 import sys
