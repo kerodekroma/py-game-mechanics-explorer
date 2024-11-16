@@ -1,5 +1,5 @@
 # how to execute it in cmd:
-# python -m mechanics.07_missile_basic
+# python -m mechanics.08_missile_consecutive
 
 import pygame
 import sys
@@ -20,27 +20,32 @@ BG_COLOR = palette[0]
 FLOOR_COLOR = palette[13]
 
 # 
-SHOT_DELAY = 500
+SHOT_DELAY = 300
 MISSILE_SPEED = 500
+
+is_pressing_button_down = False
 
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 # Adding our awesone caption to show in the top of our fresh screen
-pygame.display.set_caption("mechanics > missile basic")
+pygame.display.set_caption("mechanics > missile consecutive")
 
 # clock
 clock = pygame.time.Clock()
 
-# setup missile
-missile_static = pygame.image.load('./assets/img/missile64x64.png').convert_alpha()
-missile_static_x = 100
-missile_static_y = screen.get_height() / 2
+# missile img reference
+missile_img = pygame.image.load('./assets/img/missile64x64.png').convert_alpha()
 
-missile = pygame.image.load('./assets/img/missile64x64.png').convert_alpha()
-missile_x = 100
-missile_y = screen.get_height() / 2
-missile_vel_x = 0
+# setup initial missile position
+missile_init_x = 100
+missile_init_y = screen.get_height() / 2
+
+# setup multiple missile
+missiles = []
 missile_shot_time = 0
+
+def create_missile(pos):
+    return {'x': pos[0], 'y': pos[1], 'vel_x': MISSILE_SPEED}
 
 # adding the defs to check if the input is to the left/right
 def is_button_down(event):
@@ -67,26 +72,29 @@ while True:
             sys.exit()
 
         if is_input_tap_active(event):
-            if current_time - missile_shot_time > SHOT_DELAY:
-                missile_vel_x = MISSILE_SPEED 
-                missile_shot_time = current_time # update last shot time
+            is_pressing_button_down = True
+
+        if is_button_up(event) or event.type == pygame.KEYUP:
+            is_pressing_button_down = False
 
 	# This is the magic sentence where our screen finally renders our DEMO_BG_COLOR, yay!
     screen.fill(BG_COLOR)
 
-    missile_x += missile_vel_x * dt
-
-    if(missile_x - missile.get_rect().width > screen.get_width()):
-        missile_x = missile_static_x
-        missile_y = missile_static_y
-        missile_vel_x = 0
-        missile_shot_time = 0
-
-    # printing the missile image
-    screen.blit(missile, (missile_x, missile_y))
-
     # printing the missile ref image
-    screen.blit(missile_static, (missile_static_x, missile_static_y))
+    screen.blit(missile_img, (missile_init_x, missile_init_y))
+
+    if is_pressing_button_down and current_time - missile_shot_time > SHOT_DELAY:
+        missile_vel_x = MISSILE_SPEED 
+        missile_shot_time = current_time # update last shot time
+        missiles.append(create_missile((missile_init_x,  missile_init_y)))
+
+    # render the list of missiles 
+    for missile in missiles[:]:
+        missile['x'] += missile['vel_x'] * dt
+        screen.blit(missile_img, (missile['x'], missile['y']))
+
+        if missile['x'] - missile_img.get_rect().width > screen.get_width():
+            missiles.remove(missile)
 
     # FPS
     fps = clock.get_fps()
@@ -100,7 +108,13 @@ while True:
     time_until_next_shot = max(0, SHOT_DELAY - time_since_last_shot)
     text_content = f"Next shot in: {time_until_next_shot // 1000}.{time_until_next_shot % 1000:03d} s"
     text_surface = pixel_font.render(text_content, True, palette[2])
-    text_rect = text_surface.get_rect(topleft=(50, 250))
+    text_rect = text_surface.get_rect(topleft=(50, 150))
+    screen.blit(text_surface, text_rect)
+
+    # number of missiles
+    text_content = f"Missiles : {len(missiles)}, is pressing a key/mouse: {is_pressing_button_down}"
+    text_surface = pixel_font.render(text_content, True, palette[2])
+    text_rect = text_surface.get_rect(topleft=(50, 180))
     screen.blit(text_surface, text_rect)
 
 	# This method refreshes all the screen, is part of a good practice keep it here
