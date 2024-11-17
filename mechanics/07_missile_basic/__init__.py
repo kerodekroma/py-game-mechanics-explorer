@@ -21,7 +21,7 @@ FLOOR_COLOR = palette[13]
 
 # 
 SHOT_DELAY = 500
-MISSILE_SPEED = 500
+MISSILE_SPEED = 1200
 
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -32,11 +32,11 @@ pygame.display.set_caption("mechanics > missile basic")
 clock = pygame.time.Clock()
 
 # setup missile
-missile_static = pygame.image.load('./assets/img/missile64x64.png').convert_alpha()
+missile_static = pygame.image.load('./assets/img/missile28x20.png').convert_alpha()
 missile_static_x = 100
 missile_static_y = screen.get_height() / 2
 
-missile = pygame.image.load('./assets/img/missile64x64.png').convert_alpha()
+missile = pygame.image.load('./assets/img/missile28x20.png').convert_alpha()
 missile_x = 100
 missile_y = screen.get_height() / 2
 missile_vel_x = 0
