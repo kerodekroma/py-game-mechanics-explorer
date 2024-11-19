@@ -23,6 +23,7 @@ FLOOR_COLOR = palette[13]
 # 
 SHOT_DELAY = 300
 MISSILE_SPEED = 900
+GRAVITY = 1000
 
 is_pressing_button_down = False
 
@@ -47,7 +48,9 @@ missiles = []
 missile_shot_time = 0
 
 def create_missile(pos, angle):
-    return {'x': pos[0], 'y': pos[1], 'angle': angle}
+    vel_x = math.cos(angle) * MISSILE_SPEED
+    vel_y = math.sin(angle) * MISSILE_SPEED
+    return {'x': pos[0], 'y': pos[1], 'angle': angle, 'vel_x': vel_x, 'vel_y': vel_y}
 
 # adding the defs to check if the input is to the left/right
 def is_button_down(event):
@@ -101,11 +104,19 @@ while True:
     # render the list of missiles 
     for missile in missiles[:]:
         # applying the proper direction as well
-        missile['x'] += math.cos(missile['angle']) * MISSILE_SPEED * dt
-        missile['y'] += math.sin(missile['angle']) * MISSILE_SPEED * dt
+        # missile['x'] += math.cos(missile['angle']) * MISSILE_SPEED * dt
+        #if missile['vel_y'] == 0:
+        #    missile['vel_y'] += math.sin(missile['angle']) * MISSILE_SPEED * dt
+        #    rotation_angle = missile['angle']
+        missile['vel_y'] += GRAVITY * dt
+
+        missile['x'] += missile['vel_x'] * dt
+        missile['y'] += missile['vel_y'] * dt
+
+        rotation_angle = math.atan2(missile['vel_y'], missile['vel_x'])
 
         # applying the current angle too
-        rotated_missile = pygame.transform.rotate(missile_img, -math.degrees(missile['angle']))
+        rotated_missile = pygame.transform.rotate(missile_img, -math.degrees(rotation_angle))
         missile_rect = rotated_missile.get_rect(center=(missile['x'], missile['y']))
         screen.blit(rotated_missile, missile_rect.topleft)
 

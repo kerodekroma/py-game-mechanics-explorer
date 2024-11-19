@@ -34,7 +34,7 @@ pygame.display.set_caption("mechanics > missile consecutive")
 clock = pygame.time.Clock()
 
 # missile img reference
-missile_img = pygame.image.load('./assets/img/missile64x64.png').convert_alpha()
+missile_img = pygame.image.load('./assets/img/missile28x20.png').convert_alpha()
 
 # setup initial missile position
 missile_init_x = 100
