@@ -1,5 +1,5 @@
 # how to execute it in cmd:
-# python -m mechanics.09_missile_aiming
+# python -m mechanics.10_missile_artillery
 
 import pygame
 import math
@@ -23,13 +23,14 @@ FLOOR_COLOR = palette[13]
 # 
 SHOT_DELAY = 300
 MISSILE_SPEED = 900
+GRAVITY = 1000
 
 is_pressing_button_down = False
 
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 # Adding our awesone caption to show in the top of our fresh screen
-pygame.display.set_caption("mechanics > missile aiming")
+pygame.display.set_caption("mechanics > missile projection")
 
 # clock
 clock = pygame.time.Clock()
@@ -39,7 +40,7 @@ missile_img = pygame.image.load('./assets/img/missile28x20.png').convert_alpha()
 
 # setup initial missile position
 missile_init_x = 100
-missile_init_y = screen.get_height() / 2 + screen.get_height() / 5
+missile_init_y = screen.get_height() - 100
 missile_angle = math.radians(90)
 
 # setup multiple missile
@@ -47,7 +48,9 @@ missiles = []
 missile_shot_time = 0
 
 def create_missile(pos, angle):
-    return {'x': pos[0], 'y': pos[1], 'angle': angle}
+    vel_x = math.cos(angle) * MISSILE_SPEED
+    vel_y = math.sin(angle) * MISSILE_SPEED
+    return {'x': pos[0], 'y': pos[1], 'angle': angle, 'vel_x': vel_x, 'vel_y': vel_y}
 
 # adding the defs to check if the input is to the left/right
 def is_button_down(event):
@@ -101,23 +104,29 @@ while True:
     # render the list of missiles 
     for missile in missiles[:]:
         # applying the proper direction as well
-        missile['x'] += math.cos(missile['angle']) * MISSILE_SPEED * dt
-        missile['y'] += math.sin(missile['angle']) * MISSILE_SPEED * dt
+        # missile['x'] += math.cos(missile['angle']) * MISSILE_SPEED * dt
+        #if missile['vel_y'] == 0:
+        #    missile['vel_y'] += math.sin(missile['angle']) * MISSILE_SPEED * dt
+        #    rotation_angle = missile['angle']
+        missile['vel_y'] += GRAVITY * dt
+
+        missile['x'] += missile['vel_x'] * dt
+        missile['y'] += missile['vel_y'] * dt
+
+        rotation_angle = math.atan2(missile['vel_y'], missile['vel_x'])
 
         # applying the current angle too
-        rotated_missile = pygame.transform.rotate(missile_img, -math.degrees(missile['angle']))
+        rotated_missile = pygame.transform.rotate(missile_img, -math.degrees(rotation_angle))
         missile_rect = rotated_missile.get_rect(center=(missile['x'], missile['y']))
         screen.blit(rotated_missile, missile_rect.topleft)
 
         # left to right bounds
         if missile['x'] - rotated_missile.get_rect().width > screen.get_width() or missile['x'] + rotated_missile.get_rect().width < 0:
-            if missile in missiles:
-                missiles.remove(missile)
+            missiles.remove(missile)
 
         # top to bottom bounds
         if missile['y'] - rotated_missile.get_rect().height > screen.get_height() or missile['y'] + rotated_missile.get_rect().height < 0:
-            if missile in missiles:
-                missiles.remove(missile)
+            missiles.remove(missile)
 
     # FPS
     fps = clock.get_fps()
