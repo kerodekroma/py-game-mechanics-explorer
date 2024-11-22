@@ -47,6 +47,27 @@ missile_angle = math.radians(90)
 missiles = []
 missile_shot_time = 0
 
+# setup projection
+trajectory_points = []
+
+def render_trajectory(screen, x, y, angle):
+    trajectory_points = []
+    time_simulation = 3000
+
+    for t in range(0, time_simulation, 50):
+        t /= 1000
+        dist_x = math.cos(angle) * MISSILE_SPEED * t
+        dist_y = math.sin(angle) * MISSILE_SPEED * t - 0.5 * GRAVITY * t ** 2
+        pos_x = x + dist_x
+        pos_y = y - dist_y
+        if pos_y >= WINDOW_HEIGHT - 32:
+            break
+        trajectory_points.append((pos_x, pos_y))
+
+    # render the projection points
+    for projection_point in trajectory_points:
+        pygame.draw.circle(screen, palette[4], (int(projection_point[0]), int(projection_point[1])), 3)
+
 def create_missile(pos, angle):
     vel_x = math.cos(angle) * MISSILE_SPEED
     vel_y = math.sin(angle) * MISSILE_SPEED
@@ -68,6 +89,7 @@ def is_input_tap_active(event):
 while True:
     dt = clock.tick(60) / 1000
     current_time = pygame.time.get_ticks()
+
     # In this for loop is crazy! because its always listening which event is triggering
     for event in pygame.event.get():
         # And once is equal when a user closes the window
@@ -122,11 +144,15 @@ while True:
 
         # left to right bounds
         if missile['x'] - rotated_missile.get_rect().width > screen.get_width() or missile['x'] + rotated_missile.get_rect().width < 0:
-            missiles.remove(missile)
+            if missile in missiles:
+                missiles.remove(missile)
 
         # top to bottom bounds
         if missile['y'] - rotated_missile.get_rect().height > screen.get_height() or missile['y'] + rotated_missile.get_rect().height < 0:
-            missiles.remove(missile)
+            if missile in missiles:
+                missiles.remove(missile)
+
+    render_trajectory(screen, missile_init_x, missile_init_y, -missile_angle)
 
     # FPS
     fps = clock.get_fps()
