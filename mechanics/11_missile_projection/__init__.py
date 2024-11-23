@@ -1,5 +1,5 @@
 # how to execute it in cmd:
-# python -m mechanics.10_missile_artillery
+# python -m mechanics.11_missile_projection
 
 import pygame
 import math
