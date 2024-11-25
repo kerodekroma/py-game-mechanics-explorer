@@ -20,11 +20,6 @@ pixel_font = font.pixel_font()
 BG_COLOR = palette[0]
 FLOOR_COLOR = palette[13]
 
-# 
-SHOT_DELAY = 300
-MISSILE_SPEED = 900
-GRAVITY = 1000
-
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 # Adding our awesone caption to show in the top of our fresh screen
@@ -33,19 +28,19 @@ pygame.display.set_caption("mechanics > spaceship basic motion")
 # clock
 clock = pygame.time.Clock()
 
-# missile img reference
-spaceship_img = pygame.image.load('./assets/img/spaceship32x32-normal.png').convert_alpha()
-spaceship_img_fire = pygame.image.load('./assets/img/spaceship32x32-fire.png').convert_alpha()
+# spaceship imgs reference
+spaceship_img = pygame.image.load('./assets/img/spaceship32x32_lr-idle.png').convert_alpha()
+spaceship_img_fire = pygame.image.load('./assets/img/spaceship32x32_lr-fire.png').convert_alpha()
 
-# setup initial missile position
-spaceship_rotation = 0
+# setup spaceship settings
+spaceship_rotation = math.degrees(0)
 value_rotation = 0
 ship_trust = 0
 spaceship_x = WINDOW_WIDTH / 2
 spaceship_y = WINDOW_HEIGHT / 2
 spaceship_vel_x = 0
 spaceship_vel_y = 0
-
+spaceship_fire = False
 
 # adding the defs to check if the input is to the left/right
 def is_button_down(event):
@@ -93,11 +88,13 @@ while True:
             value_rotation = 3
 
         if is_input_top_active(event, screen):
-            ship_trust = -2
+            ship_trust = 2
+            spaceship_fire = True
         
         if event.type == pygame.KEYUP or is_button_up(event):
             ship_trust = 0
             value_rotation = 0
+            spaceship_fire = False
 
 	# This is the magic sentence where our screen finally renders our DEMO_BG_COLOR, yay!
     screen.fill(BG_COLOR)
@@ -109,7 +106,8 @@ while True:
     spaceship_y += spaceship_vel_y * dt
     
     # printing the missile ref image
-    rotated_img = pygame.transform.rotate(spaceship_img, -math.degrees( spaceship_rotation ))
+    img = spaceship_img_fire if spaceship_fire == True else spaceship_img
+    rotated_img = pygame.transform.rotate(img, -math.degrees(spaceship_rotation))
     spaceship_rect = rotated_img.get_rect(center=(spaceship_x, spaceship_y))
     screen.blit(rotated_img, spaceship_rect.topleft)
 
@@ -125,6 +123,19 @@ while True:
 
     if spaceship_y + spaceship_rect.height < 0:
         spaceship_y = WINDOW_HEIGHT
+
+    # Draw rotation indicator line and angle
+    line_length = 50  # Length of the line in pixels
+    line_start = spaceship_rect.center
+    line_end = (
+        line_start[0] + math.cos(spaceship_rotation) * line_length,
+        line_start[1] + math.sin(spaceship_rotation) * line_length
+    )
+    pygame.draw.line(screen, palette[2], line_start, line_end, 1)
+    text_content = f"{int(math.degrees( spaceship_rotation ) % 360 )}°"
+    text_surface = pixel_font.render(text_content, True, palette[2])
+    text_rect = text_surface.get_rect(center=(spaceship_rect.left, spaceship_rect.bottom + 20))
+    screen.blit(text_surface, text_rect)
 
     # FPS
     fps = clock.get_fps()

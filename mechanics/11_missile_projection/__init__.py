@@ -170,7 +170,7 @@ while True:
     screen.blit(text_surface, text_rect)
 
     # missile angle
-    text_content = f"Missile angle: {missile_angle}"
+    text_content = f"Missile angle: {int( math.degrees(missile_angle) % 360 )}°"
     text_surface = pixel_font.render(text_content, True, palette[2])
     text_rect = text_surface.get_rect(topleft=(50, 180))
     screen.blit(text_surface, text_rect)
