@@ -1,5 +1,5 @@
 # how to execute it in cmd:
-# python -m mechanics.12_spaceship_basic
+# python -m mechanics.13_spaceship_drag
 
 import pygame
 import math
@@ -23,7 +23,7 @@ FLOOR_COLOR = palette[13]
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 # Adding our awesone caption to show in the top of our fresh screen
-pygame.display.set_caption("mechanics > spaceship basic motion")
+pygame.display.set_caption("mechanics > spaceship with drag motion")
 
 # clock
 clock = pygame.time.Clock()
@@ -36,6 +36,7 @@ spaceship_img_fire = pygame.image.load('./assets/img/spaceship32x32_lr-fire.png'
 spaceship_rotation = math.degrees(0)
 value_rotation = 0
 ship_trust = 0
+ship_drag = 0.9
 spaceship_x = WINDOW_WIDTH / 2
 spaceship_y = WINDOW_HEIGHT / 2
 spaceship_vel_x = 0
@@ -82,13 +83,13 @@ while True:
             sys.exit()
 
         if is_input_left_active(event, screen):
-            value_rotation = -20
+            value_rotation = -9
 
         if is_input_right_active(event, screen):
-            value_rotation = 20
+            value_rotation = 9
 
         if is_input_top_active(event, screen):
-            ship_trust = 2
+            ship_trust = 20
             spaceship_fire = True
         
         if event.type == pygame.KEYUP or is_button_up(event):
@@ -102,6 +103,8 @@ while True:
     spaceship_rotation += math.radians(value_rotation)
     spaceship_vel_x += math.cos(spaceship_rotation) * ship_trust 
     spaceship_vel_y += math.sin(spaceship_rotation) * ship_trust 
+    spaceship_vel_x *= ship_drag
+    spaceship_vel_y *= ship_drag
     spaceship_x += spaceship_vel_x * dt
     spaceship_y += spaceship_vel_y * dt
     

@@ -120,19 +120,19 @@ while True:
     fps = clock.get_fps()
     text_content = f"FPS: {int(fps)}"
     text_surface = pixel_font.render(text_content, True, palette[2])
-    text_rect = text_surface.get_rect(center=(100, 100))
+    text_rect = text_surface.get_rect(topleft=(100, 100))
     screen.blit(text_surface, text_rect)
 
     # Debugging
     # Velocity
     text_content = f"Velocity: {int( dude_vel_x )}"
     text_surface = pixel_font.render(text_content, True, palette[2])
-    text_rect = text_surface.get_rect(center=(100, 130))
+    text_rect = text_surface.get_rect(topleft=(100, 130))
     screen.blit(text_surface, text_rect)
     # Acceleration
     text_content = f"Acceleration: {int( dude_acc_x )}"
     text_surface = pixel_font.render(text_content, True, palette[2])
-    text_rect = text_surface.get_rect(center=(100, 160))
+    text_rect = text_surface.get_rect(topleft=(100, 160))
     screen.blit(text_surface, text_rect)
 
 	# This method refreshes all the screen, is part of a good practice keep it here
