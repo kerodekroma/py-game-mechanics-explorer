@@ -6,6 +6,8 @@ import math
 import sys
 from toolbox import colors, font
 
+from collections import deque
+
 # Initializing Pygame
 pygame.init()
 
@@ -19,7 +21,7 @@ pixel_font = font.pixel_font()
 # Defining the color to print in the screen
 BG_COLOR = palette[0]
 FLOOR_COLOR = palette[13]
-SPEED = 7
+SPEED = 10
 MIN_DISTANCE = 50
 
 # The screen is almost ready, this is just the definition
@@ -38,9 +40,13 @@ class Dude():
         self.vx = 0
         self.vy = 0
         self.img = pygame.image.load('./assets/img/orangito32x32.png').convert_alpha()
-        # it will memorize the steps of the next dudes
-        self.memory_max_length = 3
-        self.memory = []
+        # it will memorize the steps of the next dudes and the max length
+        # self.memory_max_length = 3
+        # self.memory = []
+
+        # in this mode is more optimized
+        self.memory = deque(maxlen=3)
+
         self.target_from_mem = {x: 0, y: 0}
         self.target_is_moving = False
 
@@ -57,43 +63,41 @@ def check_distance(pos_a, pos_b):
     return math.sqrt((pos_a[0] - pos_b[0]) ** 2 + (pos_a[1] - pos_b[1]) ** 2)
 
 def move(dude, target_x, target_y):
-    dude.target_is_moving = False
     dude_rect = dude.img.get_rect()
 
+    # calculating the center position of the dude
     center_x = dude.x + dude_rect.width / 2 
     center_y = dude.y + dude_rect.height / 2 
 
-    if len(dude.memory):
-        dude.target_from_mem = dude.memory[0] 
-        if dude.vx != 0 or dude.vy != 0:
-            dude.target_is_moving = True
+    # use the memory for target if available
+    if dude.memory:
+        dude.target_from_mem = dude.memory[0]
 
-    #if it doesn't have any memory or history
-    if not len(dude.memory):
-        dude.target_from_mem['x'] = target_x
-        dude.target_from_mem['y'] = target_y
-        distance = check_distance( [center_x, center_y], [dude.target_from_mem['x'], dude.target_from_mem['y']] )
+    # if not, it takes directly
+    if not dude.memory:
+        dude.target_from_mem = {'x': target_x, 'y': target_y}
 
-        if distance > MIN_DISTANCE:
-            dude.target_is_moving = True
+    distance = check_distance([center_x, center_y], [dude.target_from_mem['x'], dude.target_from_mem['y']])
 
-        if not distance > MIN_DISTANCE:
-            dude.target_is_moving = False
-
-    if dude.target_is_moving:
-        dude.memory.append({"x": dude.x, "y": dude.y})
-
-        # limiting the memory
-        if len(dude.memory) > dude.memory_max_length:
-            dude.memory.pop(0)
-        
+    if distance > MIN_DISTANCE:
         dude.vx = (dude.target_from_mem['x'] - dude.x) * SPEED
         dude.vy = (dude.target_from_mem['y'] - dude.y) * SPEED
+        dude.target_is_moving = True
 
-    if not dude.target_is_moving:
+    if not distance > MIN_DISTANCE:
         dude.vx = 0
         dude.vy = 0
+        dude.target_is_moving = False
 
+        # if dude reached the top of the memory
+        if dude.memory:
+            dude.memory.pop()
+
+    if dude.target_is_moving:
+        dude.memory.append({"x": dude.x, 'y': dude.y})
+        # limit memory size
+        # if len(dude.memory) > dude.memory_max_length:
+        #     dude.memory.pop(0)
 
 # Flag to run our loop, it's optional in this example but useful to get used too
 while True:
