@@ -21,8 +21,8 @@ pixel_font = font.pixel_font()
 # Defining the color to print in the screen
 BG_COLOR = palette[0]
 FLOOR_COLOR = palette[13]
-SPEED = 10
-MIN_DISTANCE = 50
+SPEED = 200
+MIN_DISTANCE = 25
 
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -46,8 +46,6 @@ class Dude():
 
         # in this mode is more optimized
         self.memory = deque(maxlen=3)
-
-        self.target_from_mem = {x: 0, y: 0}
         self.target_is_moving = False
 
     def render(self, screen, dt):
@@ -62,42 +60,35 @@ dude3 = Dude()
 def check_distance(pos_a, pos_b):
     return math.sqrt((pos_a[0] - pos_b[0]) ** 2 + (pos_a[1] - pos_b[1]) ** 2)
 
-def move(dude, target_x, target_y):
+def angle_between(pos_a, pos_b):
+    return math.atan2(pos_b[1] - pos_a[1], pos_b[0] - pos_a[0])
+
+def move(dude, dude_target):
     dude_rect = dude.img.get_rect()
 
     # calculating the center position of the dude
     center_x = dude.x + dude_rect.width / 2 
     center_y = dude.y + dude_rect.height / 2 
 
-    # use the memory for target if available
-    if dude.memory:
-        dude.target_from_mem = dude.memory[0]
+    if dude_target:
+        if isinstance(dude_target, Dude) and dude_target.memory:
+            target_x, target_y = dude_target.memory[0]
+        if not isinstance(dude_target, Dude):
+            target_x, target_y = dude_target[0], dude_target[1]
+        
+        # Calculate distance to target
+        dist = check_distance(( dude.x, dude.y ), ( target_x, target_y ))
+        if dist > MIN_DISTANCE:
+            # Move towards the target
+            angle = angle_between(( dude.x, dude.y ), ( target_x, target_y ))
+            dude.vx = math.cos(angle) * SPEED
+            dude.vy = math.sin(angle) * SPEED
 
-    # if not, it takes directly
-    if not dude.memory:
-        dude.target_from_mem = {'x': target_x, 'y': target_y}
+        if not dist > MIN_DISTANCE:
+            dude.vx = 0
+            dude.vy = 0
 
-    distance = check_distance([center_x, center_y], [dude.target_from_mem['x'], dude.target_from_mem['y']])
-
-    if distance > MIN_DISTANCE:
-        dude.vx = (dude.target_from_mem['x'] - dude.x) * SPEED
-        dude.vy = (dude.target_from_mem['y'] - dude.y) * SPEED
-        dude.target_is_moving = True
-
-    if not distance > MIN_DISTANCE:
-        dude.vx = 0
-        dude.vy = 0
-        dude.target_is_moving = False
-
-        # if dude reached the top of the memory
-        if dude.memory:
-            dude.memory.pop()
-
-    if dude.target_is_moving:
-        dude.memory.append({"x": dude.x, 'y': dude.y})
-        # limit memory size
-        # if len(dude.memory) > dude.memory_max_length:
-        #     dude.memory.pop(0)
+    dude.memory.append((dude.x, dude.y))
 
 # Flag to run our loop, it's optional in this example but useful to get used too
 while True:
@@ -115,9 +106,9 @@ while True:
     mouse_pos = pygame.mouse.get_pos()
 
 
-    move(dude1, mouse_pos[0], mouse_pos[1])
-    move(dude2, dude1.x, dude1.y)
-    move(dude3, dude2.x, dude2.y)
+    move(dude1, (mouse_pos[0], mouse_pos[1]))
+    move(dude2, dude1)
+    move(dude3, dude2)
 
 	# This is the magic sentence where our screen finally renders our DEMO_BG_COLOR, yay!
     screen.fill(BG_COLOR)
