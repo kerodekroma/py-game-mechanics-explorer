@@ -173,19 +173,19 @@ while True:
 
     # Debugging
     # Velocity
-    text_content = f"Velocity X: { dude_vel_x }"
+    text_content = f"Velocity X: { int(dude_vel_x) }"
     text_surface = pixel_font.render(text_content, True, palette[2])
     text_rect = text_surface.get_rect(topleft=(50, 130))
     screen.blit(text_surface, text_rect)
 
     # Velocity
-    text_content = f"Velocity Y: { dude_vel_y }"
+    text_content = f"Velocity Y: { int(dude_vel_y) }"
     text_surface = pixel_font.render(text_content, True, palette[2])
     text_rect = text_surface.get_rect(topleft=(50, 160))
     screen.blit(text_surface, text_rect)
 
     # Acceleration
-    text_content = f"Acceleration: {int( dude_acc_x )}"
+    text_content = f"Acceleration: { int(dude_acc_x) }"
     text_surface = pixel_font.render(text_content, True, palette[2])
     text_rect = text_surface.get_rect(topleft=(50, 190))
     screen.blit(text_surface, text_rect)
