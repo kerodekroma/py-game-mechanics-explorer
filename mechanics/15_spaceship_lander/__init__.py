@@ -21,7 +21,7 @@ BG_COLOR = palette[0]
 FLOOR_COLOR = palette[13]
 
 # CONSTANTS
-GRAVITY = 20
+GRAVITY = 10
 
 # The screen is almost ready, this is just the definition
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
